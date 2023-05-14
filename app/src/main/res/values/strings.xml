@@ -3,7 +3,8 @@
     <string name="app_header">Крестики-нолики</string>
     <string name="menu_helper">Показать меню</string>
     <string name="menu_item_new_game">Новая игра</string>
-    <string name="menu_item_change_theme">Сменить тему</string>
+    <string name="menu_item_change_theme_light">Светлая тема</string>
+    <string name="menu_item_change_theme_dark">Тёмная тема</string>
     <string name="menu_item_exit">Выход</string>
     <string name="game_info_nothing">Ничья!</string>
     <string name="game_info_cross_win">Победили крестики!</string>

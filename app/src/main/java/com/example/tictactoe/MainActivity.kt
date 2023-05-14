@@ -12,7 +12,6 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -23,7 +22,7 @@ import com.example.tictactoe.ui.GameViewModel
 import com.example.tictactoe.ui.theme.TicTacToeTheme
 
 class MainActivity : ComponentActivity() {
-    private val gameViewModel = GameViewModel(Game(GameConfiguration(GameMode.CrossComputer, 3)))
+    private val gameViewModel = GameViewModel(Game(GameConfiguration(GameMode.ZeroComputer, 3)))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,11 +55,13 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun TopBar() {
         var expanded by remember { mutableStateOf(false) }
+        val isDarkTheme by gameViewModel.isDarkTheme.collectAsState()
 
         TopAppBar(backgroundColor = MaterialTheme.colors.primary) {
             Text(text = stringResource(R.string.app_header))
             Box(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .wrapContentSize(Alignment.TopEnd)
             ) {
                 IconButton(onClick = { expanded = true }) {
@@ -75,7 +76,7 @@ class MainActivity : ComponentActivity() {
                     }
                     Divider()
                     DropdownMenuItem(onClick = { gameViewModel.changeTheme() }) {
-                        Text(stringResource(R.string.menu_item_change_theme))
+                        Text(stringResource(if (isDarkTheme) R.string.menu_item_change_theme_light else R.string.menu_item_change_theme_dark))
                     }
                     Divider()
                     DropdownMenuItem(onClick = { finish() }) {
@@ -88,19 +89,22 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun Content(paddingValues: PaddingValues) {
-        val uiState by gameViewModel.uiState.collectAsState()
         val boxSize = gameViewModel.getGameConfiguration().boxSize
+        val uiState by gameViewModel.uiState.collectAsState()
+
         Column (Modifier.fillMaxWidth()) {
             for (i in 0 until boxSize) {
-                Row {
+                Row (Modifier
+                    .fillMaxWidth()
+                    .height(Dp(120f))) {
                     for (j in 0 until boxSize) {
                         IconButton(
                             modifier = Modifier
                                 .weight(.3f, true)
-                                .background(Color.LightGray)
-                                .border(Dp(.5f), Color.Black)
-                                .padding(paddingValues),
-                            onClick = { if (uiState.cells[i][j].cellType == CellState.Empty) gameViewModel.zeroStep(i, j) }
+                                .fillMaxHeight()
+                                .background(MaterialTheme.colors.background)
+                                .border(Dp(.5f), MaterialTheme.colors.onSurface),
+                            onClick = { if (uiState.cells[i][j].cellType == CellState.Empty) gameViewModel.crossStep(i, j) }
                         ) {
                             when (uiState.cells[i][j].cellType) {
                                 CellState.Cross -> Icon(ImageVector.vectorResource(R.drawable.cross_icon), contentDescription = "Cross", tint = MaterialTheme.colors.secondaryVariant)
@@ -123,6 +127,9 @@ class MainActivity : ComponentActivity() {
             }
             GameStateType.ZeroWinner -> Snackbar {
                 Text(text = stringResource(R.string.game_info_zero_win))
+            }
+            GameStateType.Nothing -> Snackbar {
+                Text(text = stringResource(R.string.game_info_nothing))
             }
             else -> {}
         }
