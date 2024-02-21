@@ -17,15 +17,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.lifecycle.ViewModelProvider
 import com.example.tictactoe.models.*
 import com.example.tictactoe.ui.GameViewModel
+import com.example.tictactoe.ui.GameViewModelFactory
 import com.example.tictactoe.ui.theme.TicTacToeTheme
 
 class MainActivity : ComponentActivity() {
-    private val gameViewModel = GameViewModel(Game(GameConfiguration(GameMode.ZeroComputer, 3)))
+    private lateinit var gameViewModel: GameViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        gameViewModel = ViewModelProvider(this, GameViewModelFactory(Game(GameConfiguration(GameMode.ZeroComputer, 3))))
+            .get(GameViewModel::class.java)
         setContent {
             val isDarkTheme by gameViewModel.isDarkTheme.collectAsState()
             TicTacToeTheme(darkTheme = isDarkTheme) {
